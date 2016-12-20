@@ -13,6 +13,7 @@ public:
   static NAN_MODULE_INIT(Init);
 
   static NAN_METHOD(New);
+  static NAN_METHOD(Close);
   static NAN_METHOD(BindRaw);
   static NAN_METHOD(BindUser);
   static NAN_METHOD(BindControl);
@@ -26,6 +27,7 @@ private:
   BluetoothHciSocket();
   ~BluetoothHciSocket();
 
+  void closeSocket();
   void start();
   int bindRaw(int* devId);
   int bindUser(int* devId);

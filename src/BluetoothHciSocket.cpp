@@ -116,6 +116,7 @@ NAN_MODULE_INIT(BluetoothHciSocket::Init) {
   tmpl->InstanceTemplate()->SetInternalFieldCount(1);
   tmpl->SetClassName(Nan::New("BluetoothHciSocket").ToLocalChecked());
 
+  Nan::SetPrototypeMethod(tmpl, "closeSocket", Close);
   Nan::SetPrototypeMethod(tmpl, "start", Start);
   Nan::SetPrototypeMethod(tmpl, "bindRaw", BindRaw);
   Nan::SetPrototypeMethod(tmpl, "bindUser", BindUser);
@@ -139,9 +140,15 @@ BluetoothHciSocket::BluetoothHciSocket() :
 }
 
 BluetoothHciSocket::~BluetoothHciSocket() {
-  uv_close((uv_handle_t*)&this->_pollHandle, (uv_close_cb)BluetoothHciSocket::PollCloseCallback);
+  closeSocket();
+}
 
-  close(this->_socket);
+void BluetoothHciSocket::closeSocket() {
+  if (this->_socket >= 0) {
+    uv_close((uv_handle_t*)&this->_pollHandle, (uv_close_cb)BluetoothHciSocket::PollCloseCallback);
+    close(this->_socket);
+    this->_socket = -1;
+  }
 }
 
 void BluetoothHciSocket::start() {
